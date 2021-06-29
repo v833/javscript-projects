@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>实现彩虹画笔绘画板😊</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+    }
+
+    canvas {
+      border: 1px solid black;
+    }
+  </style>
+</head>
+
+<body>
+  <canvas id="draw" width="1200" height="800"></canvas>
+
+  <script type="text/javascript">
+    // 获取canvas节点
+    let canvas = document.querySelector('#draw');
+    let ctx = canvas.getContext("2d");
+
+    let colorDeg = 0;
+    let lineWidth = 50;
+    let direction = true;
+    // hsl 色相(0 - 360) 饱和度 明度
+    ctx.strokeStyle = `hsl(${colorDeg}, 90%, 50%)`;
+    ctx.lineWidth = `${lineWidth}`;
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+
+    let drawing = false;
+    let [x, y] = [0, 0]
+
+    canvas.addEventListener("mousedown", (e) => {
+      drawing = true;
+      // 括号，方括号，正则开头的斜杠，加号，减号，反引号 作为行首的时候必须要加分号
+      [x, y] = [e.offsetX, e.offsetY]
+    });
+    canvas.addEventListener('mousemove', (e) => {
+      if (!drawing) return;
+      ctx.beginPath();
+
+      // 控制笔触大小
+      colorDeg = colorDeg < 360 ? colorDeg + 1 : 0;
+      if (lineWidth > 50 || lineWidth < 10) {
+        direction = !direction
+      }
+      direction ? lineWidth++ : lineWidth--;
+      ctx.lineWidth = `${lineWidth}`;
+
+      // 彩虹效
+      ctx.strokeStyle = `hsl(${colorDeg}, 90%, 50%)`;
+
+      // 控制绘制路径
+      ctx.moveTo(x, y);
+      console.log(x, y);
+      ctx.lineTo(e.offsetX, e.offsetY);
+      [x, y] = [e.offsetX, e.offsetY];
+      ctx.stroke();
+    })
+    canvas.addEventListener('mouseup', () => {
+      drawing = false
+    });
+    canvas.addEventListener('mouseleave', () => {
+      drawing = false
+    })
+  </script>
+</body>
+
+</html>
