@@ -1,6 +1,4 @@
-# Day03 - CSS 变量
-
-[查看效果](https://v833.github.io/javscript-projects/03-CSS%20Variables/)
+# CSS 变量
 
 ## 实现效果
 

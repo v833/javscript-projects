@@ -259,3 +259,4 @@ canvas.addEventListener('mouseup', () => drawing = false);
 // 当鼠标不在可绘图区域范围内时，将drawing置为false
 canvas.addEventListener('mouseout', () => drawing = false);
 ```
+

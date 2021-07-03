@@ -1,4 +1,4 @@
-# Day30 - Whack A Mole
+# Whack A Mole
 
 ## HTML 代码
 
