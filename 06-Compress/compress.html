@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>compress</title>
+</head>
+
+<body>
+  <input type="file" id="upload">
+
+  <script>
+    const ACCEPT = ['image/jpeg', 'image/png']
+    const MAXSIZE = 1024 * 1024 * 3
+    const MAXSIZE_STR = '3MB'
+    function convertImageToBase64(file, callback) {
+      let reader = new FileReader()
+      reader.addEventListener('load', function (e) {
+        const base64Image = e.target.result
+        callback && callback(base64Image)
+        reader = null
+      })
+      reader.readAsDataURL(file)
+    }
+    function compress(base64Image, callback) {
+      // 核心
+      let maxWidth = 1024
+      let maxHeight = 1024
+      const image = new Image()
+      image.addEventListener('load', function (e) {
+        let ratio // 图片的压缩比
+        let needCompress = false // 是否 需要压缩
+        if (maxWidth < image.naturalWidth) {
+          needCompress = true
+          ratio = image.naturalWidth / maxWidth
+          maxHeight = image.naturalHeight / ratio
+        }
+        if (maxHeight < image.naturalHeight) {
+          needCompress = true
+          ratio = image.naturalHeight / maxHeight
+          maxWidth = image.naturalWidth / ratio
+        }
+        if (!compress) {
+          maxWidth = image.naturalWidth
+          maxHeight = image.naturalHeight
+        }
+        const canvas = document.createElement('canvas')
+        canvas.setAttribute('id', '__compress__')
+        canvas.width = maxWidth
+        canvas.height = maxHeight
+        canvas.style.visibility = 'visible'
+        document.body.appendChild(canvas)
+
+        const ctx = canvas.getContext('2d')
+        ctx.clearRect(0, 0, maxWidth, maxHeight)
+        ctx.drawImage(image, 0, 0, maxWidth, maxHeight)
+        const compressImage = canvas.toDataURL('image/jpeg', 0.8)
+        callback && callback(compressImage)
+        const _image = new Image()
+        _image.src = compressImage
+        document.body.appendChild(_image)
+        canvas.remove()
+        console.log('压缩比：' + image.src.length / _image.src.length);
+      })
+      image.src = base64Image
+      document.body.appendChild(image)
+    }
+    function uploadToServer(compressImage) {
+
+    }
+    const upload = document.querySelector('#upload')
+    upload.addEventListener('change', function (e) {
+      const [file] = e.target.files
+      if (!file) return
+      const { type: fileType, size: fileSize } = file
+      if (!ACCEPT.includes(fileType)) {
+        alert(`不支持[${fileType}]的类型`)
+        upload.value = ''
+        return
+      }
+      if (fileSize > MAXSIZE) {
+        alert(`文件超出${MAXSIZE_STR}!`)
+        upload.value = ''
+        return
+      }
+      // 压缩图片
+      convertImageToBase64(file, (base64Image) =>compress(base64Image, uploadToServer))
+    })
+  </script>
+</body>
+
+</html>
